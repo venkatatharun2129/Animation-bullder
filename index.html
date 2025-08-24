@@ -1,0 +1,352 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Animation Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0f17; /* page background */
+      --panel:#121826; /* cards / panels */
+      --muted:#96A3B0; /* muted text */
+      --text:#EAF2FF; /* main text */
+      --brand:#6aa2ff; /* accents */
+      --brand-2:#85f4ff; /* gradient */
+      --ring: 0 0 0 3px rgba(106,162,255,.25);
+      --radius: 16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+      color:var(--text); background: radial-gradient(1200px 800px at 80% -10%, rgba(133,244,255,.08), transparent 60%),
+                                radial-gradient(900px 600px at 10% 110%, rgba(106,162,255,.10), transparent 60%),
+                                var(--bg);
+    }
+    .container{max-width:1200px; margin:24px auto; padding:0 16px}
+    header{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px}
+    h1{font-size: clamp(22px, 2.2vw, 32px); margin:0; letter-spacing:.2px}
+    .sub{color:var(--muted); font-size:14px}.grid{
+  display:grid;
+  grid-template-columns: 360px 1fr;
+  gap:16px;
+}
+@media (max-width: 980px){ .grid{grid-template-columns:1fr;}}
+
+.card{background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.08); border-radius: var(--radius); padding:16px; backdrop-filter: blur(6px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+.card h2{margin:0 0 10px; font-size:16px; letter-spacing:.3px}
+.row{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
+.row-3{display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px}
+.field{display:flex; flex-direction:column; gap:6px; margin-bottom:10px}
+label{font-size:12px; color:var(--muted)}
+input[type="text"], input[type="number"], select, textarea{
+  width:100%; background:#0f1524; border:1px solid rgba(255,255,255,.08);
+  color:var(--text); border-radius:12px; padding:10px 12px; outline:none;
+}
+input[type="range"]{width:100%}
+input:focus, select:focus, textarea:focus{ box-shadow: var(--ring); border-color:#385CFF }
+
+.toggle{display:flex; align-items:center; gap:10px}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2)); color:#001222;
+  border:0; border-radius: 999px; padding:10px 14px; font-weight:700; cursor:pointer;
+}
+.btn.secondary{background:transparent; color:var(--text); border:1px solid rgba(255,255,255,.12)}
+.btn:active{transform: translateY(1px)}
+
+.stage{ position:relative; background: repeating-conic-gradient(from 0deg, rgba(255,255,255,.05) 0 10deg, transparent 10deg 20deg) ,
+                           radial-gradient(600px 400px at 20% -10%, rgba(106,162,255,.10), transparent 60%),
+                           #0a1120;
+        border:1px solid rgba(255,255,255,.08); border-radius: var(--radius);
+        height: 420px; display:grid; place-items:center; overflow:hidden }
+
+.shape{width:140px; height:140px; display:grid; place-items:center; font-weight:800; letter-spacing:.5px;
+       background: linear-gradient(135deg, rgba(106,162,255,.9), rgba(133,244,255,.9)); color:#04101b;
+       border-radius:24px; box-shadow: 0 10px 30px rgba(0,0,0,.35)}
+.circle{ border-radius:999px }
+.pill{ width:220px; height:90px; border-radius:999px }
+
+.controls{display:flex; gap:8px; flex-wrap:wrap}
+.code{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background:#0b1222; border-radius:12px; padding:12px; color:#d9e6ff; border:1px solid rgba(255,255,255,.08);
+      white-space: pre; overflow:auto; max-height:220px}
+
+/* Predefined keyframes */
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes fadeOut{ from{opacity:1} to{opacity:0} }
+
+@keyframes slideInLeft{ from{ transform: translateX(-120%)} to{ transform: translateX(0)} }
+@keyframes slideInRight{ from{ transform: translateX(120%)} to{ transform: translateX(0)} }
+@keyframes slideUp{ from{ transform: translateY(120%)} to{ transform: translateY(0)} }
+@keyframes slideDown{ from{ transform: translateY(-120%)} to{ transform: translateY(0)} }
+
+@keyframes scaleUp{ from{ transform: scale(.6)} to{ transform: scale(1)} }
+@keyframes scaleDown{ from{ transform: scale(1.4)} to{ transform: scale(1)} }
+
+@keyframes rotate{ from{ transform: rotate(0)} to{ transform: rotate(360deg)} }
+
+@keyframes bounce{
+  0%, 20%, 53%, 100% { transform: translate3d(0,0,0)}
+  40%, 43% { transform: translate3d(0, -30px, 0)}
+  70% { transform: translate3d(0, -15px, 0)}
+  90% { transform: translate3d(0,-4px,0)}
+}
+
+footer{ margin-top:14px; color:var(--muted); font-size:12px; text-align:center }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>🎬 Animation Builder</h1>
+        <div class="sub">Craft CSS animations visually, then copy the code.</div>
+      </div>
+      <div class="controls">
+        <button id="playBtn" class="btn">▶ Play</button>
+        <button id="pauseBtn" class="btn secondary">⏸ Pause</button>
+        <button id="replayBtn" class="btn secondary">↺ Replay</button>
+      </div>
+    </header><div class="grid">
+  <!-- Left: Controls -->
+  <section class="card" aria-label="Controls">
+    <h2>Animation Settings</h2>
+    <div class="field">
+      <label for="shape">Shape</label>
+      <select id="shape">
+        <option value="box">Rounded Box</option>
+        <option value="circle">Circle</option>
+        <option value="pill">Pill</option>
+        <option value="text">Text</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="content">Text (used when Shape = Text)</label>
+      <input type="text" id="content" placeholder="Hello CSS!" value="Hello CSS!"/>
+    </div>
+
+    <div class="field">
+      <label for="anim">Animation</label>
+      <select id="anim">
+        <optgroup label="Fades">
+          <option>fadeIn</option>
+          <option>fadeOut</option>
+        </optgroup>
+        <optgroup label="Slides">
+          <option>slideInLeft</option>
+          <option>slideInRight</option>
+          <option>slideUp</option>
+          <option>slideDown</option>
+        </optgroup>
+        <optgroup label="Scale & Rotate">
+          <option>scaleUp</option>
+          <option>scaleDown</option>
+          <option>rotate</option>
+        </optgroup>
+        <optgroup label="Fun">
+          <option>bounce</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="duration">Duration (s)</label>
+        <input type="range" id="duration" min="0.1" max="10" step="0.1" value="1.6"/>
+      </div>
+      <div class="field">
+        <label for="delay">Delay (s)</label>
+        <input type="range" id="delay" min="0" max="5" step="0.1" value="0"/>
+      </div>
+    </div>
+
+    <div class="row-3">
+      <div class="field">
+        <label for="easing">Timing Function</label>
+        <select id="easing">
+          <option>ease</option>
+          <option>linear</option>
+          <option>ease-in</option>
+          <option>ease-out</option>
+          <option>ease-in-out</option>
+          <option value="cubic-bezier(0.22, 1, 0.36, 1)">easeOutBack</option>
+          <option value="cubic-bezier(0.34, 1.56, 0.64, 1)">overshoot</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="iterations">Iterations</label>
+        <select id="iterations">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="infinite" selected>infinite</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="direction">Direction</label>
+        <select id="direction">
+          <option>normal</option>
+          <option>reverse</option>
+          <option selected>alternate</option>
+          <option>alternate-reverse</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="fillmode">Fill Mode</label>
+        <select id="fillmode">
+          <option>none</option>
+          <option>forwards</option>
+          <option>backwards</option>
+          <option selected>both</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="playstate">Play State</label>
+        <select id="playstate">
+          <option selected>running</option>
+          <option>paused</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <button class="btn" id="copyCss">Copy CSS</button>
+      <button class="btn secondary" id="copyHtml">Copy HTML</button>
+    </div>
+  </section>
+
+  <!-- Right: Stage & Code -->
+  <section class="card">
+    <h2>Preview</h2>
+    <div class="stage">
+      <div id="preview" class="shape">HELLO CSS!</div>
+    </div>
+
+    <h2 style="margin-top:16px">Generated CSS</h2>
+    <pre id="cssOut" class="code"></pre>
+
+    <h2 style="margin-top:16px">HTML Snippet</h2>
+    <pre id="htmlOut" class="code"></pre>
+  </section>
+</div>
+
+<footer>Pro tip: Tweak timing with a custom cubic-bezier value for unique feel ✨</footer>
+
+  </div>  <script>
+    const el = document.getElementById('preview');
+    const fields = {
+      shape: document.getElementById('shape'),
+      content: document.getElementById('content'),
+      anim: document.getElementById('anim'),
+      duration: document.getElementById('duration'),
+      delay: document.getElementById('delay'),
+      easing: document.getElementById('easing'),
+      iterations: document.getElementById('iterations'),
+      direction: document.getElementById('direction'),
+      fillmode: document.getElementById('fillmode'),
+      playstate: document.getElementById('playstate'),
+    };
+
+    const cssOut = document.getElementById('cssOut');
+    const htmlOut = document.getElementById('htmlOut');
+
+    function applyShape(){
+      el.className = 'shape';
+      const v = fields.shape.value;
+      if(v === 'circle') el.classList.add('circle');
+      if(v === 'pill') el.classList.add('pill');
+      if(v === 'text'){
+        el.classList.remove('shape');
+        el.style.width = 'auto';
+        el.style.height = 'auto';
+        el.style.padding = '18px 22px';
+        el.style.borderRadius = '999px';
+        el.style.background = 'linear-gradient(135deg, rgba(106,162,255,.15), rgba(133,244,255,.15))';
+        el.style.color = '#d9e6ff';
+        el.style.boxShadow = 'none';
+      } else {
+        el.style.width = '';
+        el.style.height = '';
+        el.style.padding = '';
+        el.style.borderRadius = '';
+        el.style.background = '';
+        el.style.color = '';
+        el.style.boxShadow = '';
+      }
+    }
+
+    function buildAnimationString(){
+      const name = fields.anim.value;
+      const dur = parseFloat(fields.duration.value).toFixed(1) + 's';
+      const del = parseFloat(fields.delay.value).toFixed(1) + 's';
+      const ease = fields.easing.value;
+      const it = fields.iterations.value;
+      const dir = fields.direction.value;
+      const fill = fields.fillmode.value;
+      const state = fields.playstate.value;
+      return { name, dur, del, ease, it, dir, fill, state };
+    }
+
+    function update(){
+      applyShape();
+      const {name, dur, del, ease, it, dir, fill, state} = buildAnimationString();
+      el.textContent = fields.content.value || 'Hello CSS!';
+      el.style.animation = `${name} ${dur} ${ease} ${del} ${it} ${dir} ${fill}`;
+      el.style.animationPlayState = state;
+
+      // Show code
+      const css = `/* Add this to your stylesheet */\n@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }\n@keyframes fadeOut { from { opacity: 1 } to { opacity: 0 } }\n@keyframes slideInLeft { from { transform: translateX(-120%) } to { transform: translateX(0) } }\n@keyframes slideInRight { from { transform: translateX(120%) } to { transform: translateX(0) } }\n@keyframes slideUp { from { transform: translateY(120%) } to { transform: translateY(0) } }\n@keyframes slideDown { from { transform: translateY(-120%) } to { transform: translateY(0) } }\n@keyframes scaleUp { from { transform: scale(.6) } to { transform: scale(1) } }\n@keyframes scaleDown { from { transform: scale(1.4) } to { transform: scale(1) } }\n@keyframes rotate { from { transform: rotate(0) } to { transform: rotate(360deg) } }\n@keyframes bounce {\n  0%, 20%, 53%, 100% { transform: translate3d(0,0,0) }\n  40%, 43% { transform: translate3d(0,-30px,0) }\n  70% { transform: translate3d(0,-15px,0) }\n  90% { transform: translate3d(0,-4px,0) }\n}\n\n/* Apply it to an element */\n.your-element{\n  animation: ${name} ${dur} ${ease} ${del} ${it} ${dir} ${fill};\n}`;
+      cssOut.textContent = css;
+
+      const html = `<div class="your-element">${(fields.content.value || 'Hello CSS!').replace(/`/g,'\`')}</div>`;
+      htmlOut.textContent = html;
+    }
+
+    // Controls
+    Object.values(fields).forEach(f => f.addEventListener('input', update));
+
+    document.getElementById('playBtn').addEventListener('click', () => {
+      // Restart
+      el.style.animationPlayState = 'running';
+      const old = el.style.animation;
+      el.style.animation = 'none';
+      // Force reflow
+      void el.offsetWidth;
+      el.style.animation = old;
+    });
+    document.getElementById('pauseBtn').addEventListener('click', () => {
+      el.style.animationPlayState = 'paused';
+    });
+    document.getElementById('replayBtn').addEventListener('click', () => {
+      const old = el.style.animation;
+      el.style.animation = 'none';
+      void el.offsetWidth;
+      el.style.animation = old;
+      el.style.animationPlayState = 'running';
+    });
+
+    function copy(text){
+      navigator.clipboard.writeText(text).then(()=>{
+        const original = document.title;
+        document.title = '✅ Copied!';
+        setTimeout(()=> document.title = original, 800);
+      });
+    }
+    document.getElementById('copyCss').addEventListener('click', ()=> copy(cssOut.textContent));
+    document.getElementById('copyHtml').addEventListener('click', ()=> copy(htmlOut.textContent));
+
+    // Init
+    update();
+  </script></body>
+</html>
